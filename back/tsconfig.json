@@ -10,6 +10,6 @@
     "esModuleInterop": true,
     "resolveJsonModule": true
   },
-  "include": ["pkgs/**/*.ts", "internal/**/*.ts", "cli/**/*.ts", "server.ts"],
+  "include": ["pkgs/**/*.ts", "internal/**/*.ts", "cli/**/*.ts", "types/**/*.ts", "server.ts"],
   "exclude": ["node_modules", "dist"]
 }

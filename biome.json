@@ -194,6 +194,14 @@
     { "includes": ["*.json"], "formatter": { "indentWidth": 2 } },
     { "includes": [".prettierrc", ".eslintrc"] },
     {
+      "includes": ["**/pkgs/openapi-document.ts"],
+      "linter": {
+        "rules": {
+          "style": { "useNamingConvention": "off" }
+        }
+      }
+    },
+    {
       "includes": ["*.scss"],
       "javascript": { "formatter": { "quoteStyle": "single" } },
       "formatter": { "indentWidth": 2 }

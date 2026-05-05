@@ -42,4 +42,8 @@ export class FinancialModel {
   importFromCsv(filePath: string) {
     return this.importService.importFromCsvPath(filePath);
   }
+
+  importFromCsvUtf8(utf8: string) {
+    return this.importService.importFromCsvUtf8(utf8);
+  }
 }
