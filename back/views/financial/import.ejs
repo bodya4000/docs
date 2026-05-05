@@ -1,0 +1,23 @@
+<% const flashError = typeof error !== "undefined" ? error : null; %>
+<% const importOk = typeof ok !== "undefined" ? ok : false; %>
+<% const importResult = typeof result !== "undefined" ? result : null; %>
+<%- include("../partials/head-open", { title }) %>
+<section class="panel">
+  <h1><%= title %></h1>
+  <p class="muted">Шлях до CSV на машині, де працює Node (рядкове поле, як і в POST /financial/import раніше).</p>
+  <% if (flashError) { %>
+    <div class="banner err"><%= flashError %></div>
+  <% } %>
+  <% if (importOk && importResult) { %>
+    <div class="banner ok">Імпорт завершено успішно.</div>
+    <pre class="code"><%= JSON.stringify(importResult, null, 2) %></pre>
+  <% } %>
+  <form method="post" action="/financial/import" class="stack">
+    <label>
+      Шлях до файлу (filePath)
+      <input type="text" name="filePath" required placeholder="/absolute/path/or/relative/from/cwd/to.csv" />
+    </label>
+    <button class="btn primary" type="submit">Імпорт</button>
+  </form>
+</section>
+<%- include("../partials/footer-close") %>

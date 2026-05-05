@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String @id @default(cuid())
+  email    String @unique
+  password String
+}
+
+model QuarterlyPeriod {
+  id      String            @id @default(cuid())
+  year    Int
+  quarter Int
+  values  IndicatorValue[]
+
+  @@unique([year, quarter])
+}
+
+model FinancialIndicator {
+  id     String           @id @default(cuid())
+  code   String           @unique
+  name   String
+  unit   String
+  values IndicatorValue[]
+}
+
+model IndicatorValue {
+  id          String             @id @default(cuid())
+  amount      Decimal
+  asOfDate    DateTime
+  indicatorId String
+  periodId    String
+  indicator   FinancialIndicator @relation(fields: [indicatorId], references: [id], onDelete: Cascade)
+  period      QuarterlyPeriod    @relation(fields: [periodId], references: [id], onDelete: Cascade)
+
+  @@unique([indicatorId, periodId])
+}
