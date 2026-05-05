@@ -1,0 +1,53 @@
+<% const listRows = typeof rows !== "undefined" ? rows : []; %>
+<%- include("../partials/head-open", { title }) %>
+<section class="panel">
+  <div class="row">
+    <h1><%= title %></h1>
+    <div class="actions">
+      <a class="btn" href="/financial/new">Додати</a>
+      <a class="btn secondary" href="/financial/import">Імпорт CSV</a>
+    </div>
+  </div>
+  <div class="table-scroll">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>Індикатор</th>
+          <th>Квартал</th>
+          <th>Сума</th>
+          <th>На дату</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (listRows.length === 0) { %>
+          <tr>
+            <td colspan="5" class="muted">
+              Записів немає. Імпортуйте CSV або створіть новий запис.
+            </td>
+          </tr>
+        <% } %>
+        <% listRows.forEach(function (r) { %>
+          <tr>
+            <td>
+              <div class="strong"><%= r.indicatorName %></div>
+              <div class="muted small"><%= r.indicatorCode %> · <%= r.indicatorUnit %></div>
+            </td>
+            <td><%= r.year %>-Q<%= r.quarter %></td>
+            <td class="mono"><%= r.amount %></td>
+            <td><%= new Date(r.asOfDate).toLocaleString("uk-UA") %></td>
+            <td class="right">
+              <a class="btn small" href="/financial/<%= r.id %>/edit">Змінити</a>
+              <form method="post" action="/financial/<%= r.id %>/delete" style="display: inline;">
+                <button class="btn small danger" type="submit" onclick="return confirm('Видалити запис?');">
+                  Видалити
+                </button>
+              </form>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</section>
+<%- include("../partials/footer-close") %>
