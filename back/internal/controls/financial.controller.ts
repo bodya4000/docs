@@ -47,32 +47,81 @@ export function createFinancialMvcRouter(model: FinancialModel) {
     });
   });
 
-  r.post('/financial/import', async (req, res, next) => {
-    const filePath = bodyString(req.body as Record<string, unknown>, 'filePath');
+  r.post(
+    '/financial/import',
+    (req, res, next) => {
+      financialCsvUpload(req, res, (err) => {
+        if (err) {
+          if (isMulterError(err)) {
+            res.status(400).render('financial/import', {
+              title: 'Імпорт CSV',
+              error: err.message,
+              ok: false
+            });
 
-    if (!filePath) {
-      res.status(400).render('financial/import', {
-        title: 'Імпорт CSV',
-        error: 'Вкажіть шлях до файлу CSV.',
-        ok: false
+            return;
+          }
+
+          next(err);
+
+          return;
+        }
+
+        next();
       });
+    },
+    async (req, res, next) => {
+      const filePath = bodyString(req.body as Record<string, unknown>, 'filePath');
+      const uploaded = req.file;
 
-      return;
+      try {
+        if (uploaded?.buffer?.length) {
+          const utf8 = uploaded.buffer.toString('utf8');
+          const result = await model.importFromCsvUtf8(utf8);
+
+          res.render('financial/import', {
+            title: 'Імпорт CSV',
+            error: null as string | null,
+            ok: true,
+            result
+          });
+
+          return;
+        }
+
+        if (!filePath) {
+          res.status(400).render('financial/import', {
+            title: 'Імпорт CSV',
+            error: 'Вкажіть абсолютний або відносний шлях до CSV або оберіть файл.',
+            ok: false
+          });
+
+          return;
+        }
+
+        const result = await model.importFromCsv(filePath);
+
+        res.render('financial/import', {
+          title: 'Імпорт CSV',
+          error: null as string | null,
+          ok: true,
+          result
+        });
+      } catch (err) {
+        if (err instanceof Error && err.message.includes('CSV')) {
+          res.status(400).render('financial/import', {
+            title: 'Імпорт CSV',
+            error: err.message,
+            ok: false
+          });
+
+          return;
+        }
+
+        next(err);
+      }
     }
-
-    try {
-      const result = await model.importFromCsv(filePath);
-
-      res.render('financial/import', {
-        title: 'Імпорт CSV',
-        error: null as string | null,
-        ok: true,
-        result
-      });
-    } catch (err) {
-      next(err);
-    }
-  });
+  );
 
   r.post(
     '/financial/import/upload',
