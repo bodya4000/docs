@@ -1,0 +1,33 @@
+<% const editRow = typeof row !== "undefined" ? row : null; %>
+<% const asOfInput = typeof asOfLocal !== "undefined" ? asOfLocal : ""; %>
+<% const formError = typeof error !== "undefined" ? error : null; %>
+<%- include("../partials/head-open", { title }) %>
+<section class="panel">
+  <% if (!editRow) { %>
+    <p class="muted">Немає даних для форми.</p>
+    <p><a class="btn" href="/financial">На список</a></p>
+  <% } else { %>
+    <h1><%= title %></h1>
+    <p class="muted small mono">
+      <%= editRow.indicatorCode %> · <%= editRow.year %>-Q<%= editRow.quarter %> · <%= editRow.indicatorName %>
+    </p>
+    <% if (formError) { %>
+      <div class="banner err"><%= formError %></div>
+    <% } %>
+    <form method="post" action="/financial/<%= editRow.id %>/update" class="stack">
+      <label>
+        Сума
+        <input type="text" name="amount" required value="<%= editRow.amount %>" />
+      </label>
+      <label>
+        Дата й час (as-of)
+        <input type="datetime-local" name="asOfDate" required value="<%= asOfInput %>" />
+      </label>
+      <div class="row">
+        <button class="btn primary" type="submit">Оновити</button>
+        <a class="btn secondary" href="/financial">Скасувати</a>
+      </div>
+    </form>
+  <% } %>
+</section>
+<%- include("../partials/footer-close") %>

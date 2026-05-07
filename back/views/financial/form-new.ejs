@@ -1,0 +1,50 @@
+<% const indicatorOptions = typeof indicators !== "undefined" ? indicators : []; %>
+<% const formError = typeof error !== "undefined" ? error : null; %>
+<%- include("../partials/head-open", { title }) %>
+<section class="panel">
+  <h1><%= title %></h1>
+  <% if (formError) { %>
+    <div class="banner err"><%= formError %></div>
+  <% } %>
+  <form method="post" action="/financial/create" class="stack">
+    <label>
+      Індикатор
+      <select name="indicatorId" required>
+        <% if (indicatorOptions.length === 0) { %>
+          <option value="">— немає даних у БД —</option>
+        <% } %>
+        <% indicatorOptions.forEach(function (ind) { %>
+          <option value="<%= ind.id %>"><%= ind.code %> — <%= ind.name %></option>
+        <% }); %>
+      </select>
+    </label>
+    <div class="grid2">
+      <label>
+        Рік
+        <input type="text" inputmode="numeric" name="year" required placeholder="2024" />
+      </label>
+      <label>
+        Квартал
+        <select name="quarter" required>
+          <option value="1">Q1</option>
+          <option value="2">Q2</option>
+          <option value="3">Q3</option>
+          <option value="4">Q4</option>
+        </select>
+      </label>
+    </div>
+    <label>
+      Сума
+      <input type="text" name="amount" required />
+    </label>
+    <label>
+      Дата й час (as-of)
+      <input type="datetime-local" name="asOfDate" required />
+    </label>
+    <div class="row">
+      <button class="btn primary" type="submit">Зберегти</button>
+      <a class="btn secondary" href="/financial">Назад</a>
+    </div>
+  </form>
+</section>
+<%- include("../partials/footer-close") %>
