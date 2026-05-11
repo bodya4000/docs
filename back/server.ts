@@ -15,7 +15,8 @@ const container = createContainer();
 const financialModel = new FinancialModel(
   container.financialQueryService,
   container.financialCommandService,
-  container.financialImportService
+  container.financialImportService,
+  container.csvRowDispatchContext
 );
 
 const app = express();

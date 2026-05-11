@@ -158,6 +158,119 @@ export function createFinancialMvcRouter(model: FinancialModel) {
     }
   );
 
+  r.post(
+    '/financial/import/dispatch/upload',
+    (req, res, next) => {
+      financialCsvUpload(req, res, (err) => {
+        if (err) {
+          if (isMulterError(err)) {
+            res.status(400).json({ error: err.message });
+            return;
+          }
+          next(err);
+          return;
+        }
+        next();
+      });
+    },
+    async (req, res, next) => {
+      try {
+        const f = req.file;
+        if (!f?.buffer?.length) {
+          res.status(400).json({ error: 'file field required (multipart field name: file)' });
+          return;
+        }
+        const utf8 = f.buffer.toString('utf8');
+        const result = await model.dispatchCsvToOutputUtf8(utf8);
+        res.json(result);
+      } catch (err) {
+        if (err instanceof Error && err.message.includes('CSV')) {
+          res.status(400).json({ error: err.message });
+          return;
+        }
+        next(err);
+      }
+    }
+  );
+
+  r.post(
+    '/financial/import/dispatch',
+    (req, res, next) => {
+      financialCsvUpload(req, res, (err) => {
+        if (err) {
+          if (isMulterError(err)) {
+            res.status(400).render('financial/import', {
+              title: 'Імпорт CSV',
+              error: err.message,
+              ok: false
+            });
+
+            return;
+          }
+
+          next(err);
+
+          return;
+        }
+
+        next();
+      });
+    },
+    async (req, res, next) => {
+      const filePath = bodyString(req.body as Record<string, unknown>, 'filePath');
+      const uploaded = req.file;
+
+      try {
+        if (uploaded?.buffer?.length) {
+          const utf8 = uploaded.buffer.toString('utf8');
+          const result = await model.dispatchCsvToOutputUtf8(utf8);
+
+          res.render('financial/import', {
+            title: 'Імпорт CSV',
+            error: null as string | null,
+            ok: true,
+            result,
+            dispatchOnly: true
+          });
+
+          return;
+        }
+
+        if (!filePath) {
+          res.status(400).render('financial/import', {
+            title: 'Імпорт CSV',
+            error: 'Вкажіть абсолютний або відносний шлях до CSV або оберіть файл.',
+            ok: false
+          });
+
+          return;
+        }
+
+        const result = await model.dispatchCsvToOutputPath(filePath);
+
+        res.render('financial/import', {
+          title: 'Імпорт CSV',
+          error: null as string | null,
+          ok: true,
+          result,
+          dispatchOnly: true
+        });
+      } catch (err) {
+        if (err instanceof Error && err.message.includes('CSV')) {
+          res.status(400).render('financial/import', {
+            title: 'Імпорт CSV',
+            error: err.message,
+            ok: false
+          });
+
+          return;
+        }
+
+        next(err);
+      }
+    }
+  );
+
   r.get('/financial/new', async (_req, res, next) => {
     try {
       const indicators = await model.listIndicators();

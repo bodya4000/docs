@@ -22,3 +22,29 @@ export function resolveJwtExpiresSec(): number {
   const parsed = Number.parseInt(raw, 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : appConfig.defaultJwtExpiresSec;
 }
+
+export function resolveKafkaBrokers(): string[] {
+  const raw = process.env.KAFKA_BROKERS?.trim();
+  const s = raw && raw.length > 0 ? raw : 'localhost:9092';
+  return s.split(',').map((b) => b.trim()).filter(Boolean);
+}
+
+export function resolveKafkaTopic(): string {
+  const raw = process.env.KAFKA_TOPIC?.trim();
+  return raw && raw.length > 0 ? raw : 'financial-csv-rows';
+}
+
+export function resolveKafkaClientId(): string {
+  const raw = process.env.KAFKA_CLIENT_ID?.trim();
+  return raw && raw.length > 0 ? raw : 'unik-docs-csv-dispatch';
+}
+
+export function resolveRedisUrl(): string {
+  const raw = process.env.REDIS_URL?.trim();
+  return raw && raw.length > 0 ? raw : 'redis://127.0.0.1:6379';
+}
+
+export function resolveRedisListKey(): string {
+  const raw = process.env.REDIS_CSV_LIST_KEY?.trim();
+  return raw && raw.length > 0 ? raw : 'financial_csv_rows';
+}

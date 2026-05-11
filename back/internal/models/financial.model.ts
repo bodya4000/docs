@@ -5,12 +5,14 @@ import type {
 import type { IFinancialCommandService } from "../servs/financial-command.interface.js";
 import type { IFinancialImportService } from "../servs/financial-import.interface.js";
 import type { IFinancialQueryService } from "../servs/financial-query.interface.js";
+import type { CsvRowDispatchContext } from "../servs/csv-row-dispatch.context.js";
 
 export class FinancialModel {
   constructor(
     private readonly queryService: IFinancialQueryService,
     private readonly commandService: IFinancialCommandService,
     private readonly importService: IFinancialImportService,
+    private readonly csvRowDispatchContext: CsvRowDispatchContext,
   ) {}
 
   listIndicatorValues(limit: number) {
@@ -45,5 +47,13 @@ export class FinancialModel {
 
   importFromCsvUtf8(utf8: string) {
     return this.importService.importFromCsvUtf8(utf8);
+  }
+
+  dispatchCsvToOutputPath(filePath: string) {
+    return this.csvRowDispatchContext.dispatchFile(filePath);
+  }
+
+  dispatchCsvToOutputUtf8(utf8: string) {
+    return this.csvRowDispatchContext.dispatchUtf8(utf8);
   }
 }
