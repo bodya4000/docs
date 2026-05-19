@@ -1,0 +1,40 @@
+<% const flashError = typeof error !== "undefined" ? error : null; %>
+<% const importOk = typeof ok !== "undefined" ? ok : false; %>
+<% const importResult = typeof result !== "undefined" ? result : null; %>
+<% const isDispatch = typeof dispatchOnly !== "undefined" && dispatchOnly; %>
+<%- include("../partials/head-open", { title }) %>
+<section class="panel">
+  <h1><%= title %></h1>
+  <p class="muted">Або оберіть CSV через діалог файлу (вміст читається на сервері), або вкажіть шлях на машині, де працює Node — перед імпортом він нормалізується до абсолютного.</p>
+  <% if (flashError) { %>
+    <div class="banner err"><%= flashError %></div>
+  <% } %>
+  <% if (importOk && importResult) { %>
+    <div class="banner ok"><%= isDispatch ? "Рядки надіслано через OUTPUT_STRATEGY (без запису в БД)." : "Імпорт завершено успішно." %></div>
+    <pre class="code"><%= JSON.stringify(importResult, null, 2) %></pre>
+  <% } %>
+  <form method="post" action="/financial/import" enctype="multipart/form-data" class="stack">
+    <label>
+      Файл CSV (опційно)
+      <input type="file" name="file" accept=".csv,text/csv" />
+    </label>
+    <label>
+      Шлях до файлу (filePath), якщо без завантаження
+      <input type="text" name="filePath" placeholder="/absolute/path/or/relative/from/cwd/to.csv" />
+    </label>
+    <button class="btn primary" type="submit">Імпорт у базу</button>
+  </form>
+  <p class="muted">Стратегія виводу (console / kafka / redis) задається змінною середовища OUTPUT_STRATEGY.</p>
+  <form method="post" action="/financial/import/dispatch" enctype="multipart/form-data" class="stack">
+    <label>
+      Файл CSV (опційно)
+      <input type="file" name="file" accept=".csv,text/csv" />
+    </label>
+    <label>
+      Шлях до файлу (filePath), якщо без завантаження
+      <input type="text" name="filePath" placeholder="/absolute/path/or/relative/from/cwd/to.csv" />
+    </label>
+    <button class="btn primary" type="submit">Надіслати рядки (стратегія)</button>
+  </form>
+</section>
+<%- include("../partials/footer-close") %>

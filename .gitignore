@@ -1,0 +1,14 @@
+node_modules
+dist
+build
+coverage
+.cache
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store
+
+back/prisma/dev.db
+back/prisma/dev.db-journal
+back/data
